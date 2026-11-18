@@ -1,0 +1,4 @@
+tamano,estrategia,repeticion,resultado,tiempo_segundos
+100,secuencial,1,25,4.51e-05
+100,hilos,1,25,0.0055799
+100,procesos,1,25,0.6231648
