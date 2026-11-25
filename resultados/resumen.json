@@ -1,0 +1,22 @@
+{
+  "linea_base": {
+    "media_segundos": 1.4537301999982446,
+    "mediana_segundos": 1.3823836001101881,
+    "desviacion_estandar_segundos": 0.16077248835637792
+  },
+  "buffer_4096": {
+    "media_segundos": 0.024082499975338578,
+    "mediana_segundos": 0.025869800010696054,
+    "desviacion_estandar_segundos": 0.0034522143545293923
+  },
+  "buffer_65536": {
+    "media_segundos": 0.02806720002554357,
+    "mediana_segundos": 0.027736600022763014,
+    "desviacion_estandar_segundos": 0.0007661880249005253
+  },
+  "texto_lineas": {
+    "media_segundos": 0.025876840064302086,
+    "mediana_segundos": 0.02636929997242987,
+    "desviacion_estandar_segundos": 0.0038717932360352787
+  }
+}

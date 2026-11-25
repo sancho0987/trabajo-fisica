@@ -1,8 +1,7 @@
-# Entorno de ejecución
+# Registro del entorno
 
-El experimento funciona con Python 3.10 o superior y usa únicamente la biblioteca estándar para las estrategias y mediciones.
+El comando de experimento guarda automáticamente sistema operativo, versión, arquitectura, procesador, versión de Python, CPU lógicas y directorio temporal en `resultados/entorno.json`.
 
-Registrar sistema operativo, versión, arquitectura, procesador y cantidad de CPU lógicas en `resultados/entorno.json`.
+Registrar además manualmente si la lectura se hizo en caliente o en frío. Por defecto las lecturas pueden estar en caliente debido a la caché de páginas del sistema operativo; no se vacía la caché. Para que las ejecuciones sean comparables, usar el mismo equipo, unidad, sistema de archivos, fuente de alimentación y aplicaciones abiertas.
 
-## Monitor opcional
-Instalar `psutil` con `pip install psutil`. La lectura de porcentaje de CPU y frecuencia suele estar disponible; la temperatura depende del hardware, los controladores y el sistema operativo. En equipos donde no esté soportada, el campo de temperatura queda vacío/no disponible. El monitor no forma parte del cronometraje principal.
+El monitor de CPU no se incluye en el tiempo medido. Si se desea tomar muestras del sistema, `psutil` es opcional (`pip install -r requirements.txt`); temperatura y frecuencia dependen del sistema operativo y del hardware.

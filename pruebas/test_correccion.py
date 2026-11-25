@@ -1,18 +1,32 @@
+import tempfile
 import unittest
-from src.estrategias import estrategia_secuencial, estrategia_hilos, estrategia_procesos
+from pathlib import Path
 
-class PruebasEstrategias(unittest.TestCase):
-    def test_limites_pequenos(self):
-        for limite in (0, 1, 2, 10, 100, 1000):
-            esperado = estrategia_secuencial(limite)
-            self.assertEqual(estrategia_hilos(limite, 2), esperado)
-            self.assertEqual(estrategia_procesos(limite, 2), esperado)
+from src.estrategias import buffered, texto_lineas
+from src.linea_base import ejecutar
 
-    def test_valores_conocidos(self):
-        # π(10)=4, π(100)=25, π(1000)=168
-        self.assertEqual(estrategia_secuencial(10), 4)
-        self.assertEqual(estrategia_secuencial(100), 25)
-        self.assertEqual(estrategia_secuencial(1000), 168)
+
+class PruebasEstrategiasEIO(unittest.TestCase):
+    def comparar(self, eventos, tamano):
+        with tempfile.TemporaryDirectory() as carpeta:
+            base = ejecutar(Path(carpeta) / "base.log", eventos, tamano)
+            esperado = (base["bytes_leidos"], base["sha256"])
+            for bloque in (1, 4096, 65536):
+                with self.subTest(estrategia="buffer", bloque=bloque):
+                    self.assertEqual(buffered(Path(carpeta) / f"b{bloque}.log", eventos, tamano, bloque), esperado)
+            self.assertEqual(texto_lineas(Path(carpeta) / "texto.log", eventos, tamano), esperado)
+
+    def test_estrategias_escriben_contenido_identico(self):
+        self.comparar(7, 64)
+
+    def test_archivos_vacios(self):
+        self.comparar(0, 64)
+
+    def test_rechaza_registro_demasiado_corto(self):
+        with tempfile.TemporaryDirectory() as carpeta:
+            with self.assertRaises(ValueError):
+                buffered(Path(carpeta) / "error.log", 1, 4, 16)
+
 
 if __name__ == "__main__":
     unittest.main()

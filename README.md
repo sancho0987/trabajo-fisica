@@ -1,67 +1,37 @@
-# Experimento: ejecución secuencial, hilos y procesos
+# Experimento de lectura y escritura de archivos
 
-Proyecto en Python que compara tres maneras de contar números primos desde 2 hasta N:
-- **A (base):** ejecución secuencial.
-- **B:** ejecución con hilos (`ThreadPoolExecutor`).
-- **C:** ejecución con procesos (`ProcessPoolExecutor`).
-
-Las tres estrategias deben devolver exactamente el mismo conteo. El experimento comprueba esta condición en cada caso y registra tiempos.
+Experimento reproducible para el caso simulado de DocuArchivo S.A.S. Compara una línea base que abre/cierra el archivo por evento y lo lee byte a byte con dos tamaños de bloque y una alternativa de texto por líneas. Todas las estrategias procesan registros idénticos; su longitud y SHA-256 se verifican en cada medición.
 
 ## Requisitos
+
 - Python 3.10 o superior.
-- No se necesitan paquetes externos para el experimento principal.
-- `psutil` es opcional para el monitor.
+- No requiere paquetes externos.
 
-## Instalación
-Abre una terminal en la carpeta del proyecto y ejecuta:
+## Primera evidencia
+
+Desde la raíz del repositorio:
 
 ```bash
-python -m venv .venv
+python -m src.linea_base
 ```
 
-Windows:
-```bash
-.venv\Scripts\activate
-```
+La ejecución predeterminada procesa 5.000 eventos de 64 bytes e imprime tiempo, bytes y SHA-256; guarda la evidencia en `resultados/evidencia_linea_base.json`.
 
-macOS/Linux:
-```bash
-source .venv/bin/activate
-```
+## Verificación y experimento
 
-Instalación opcional del monitor:
-```bash
-pip install -r requirements.txt
-```
-
-## Ejecutar pruebas
 ```bash
 python -m unittest discover -s pruebas -v
-```
-
-## Ejecutar experimento
-```bash
 python -m experimentos.ejecutar_experimento
 ```
 
-Por defecto usa tamaños 1000, 5000 y 10000 y realiza 5 repeticiones por cada estrategia y tamaño.
+El experimento usa cinco repeticiones y tamaños de escritura de 4 KiB y 64 KiB. Para cambiar parámetros:
 
-Personalizar:
 ```bash
-python -m experimentos.ejecutar_experimento --tamanos 1000 5000 20000 --repeticiones 10 --trabajadores 4
+python -m experimentos.ejecutar_experimento --eventos 20000 --bytes-por-evento 64 --repeticiones 7 --bloques 4096 65536 262144
 ```
 
-Se exige un mínimo de 5 repeticiones.
+Las repeticiones no pueden ser inferiores a cinco. Se generan `resultados.csv`, `resultados.json`, `entorno.json`, `resumen.json` y `comparacion.svg` en la carpeta de resultados.
 
-## Resultados
-Se crean automáticamente:
-- `resultados/resultados.csv`
-- `resultados/resultados.json`
-- `resultados/entorno.json`
+## Diseño y análisis
 
-## Nota sobre Windows y procesos
-Ejecuta el experimento como módulo desde la raíz del proyecto, usando el comando anterior. El punto de entrada protege la ejecución con `if __name__ == "__main__":`, y la función de trabajo está definida en el nivel superior de `src/estrategias.py`. Esto permite que Windows use el método `spawn` sin intentar importar código ejecutable del intérprete interactivo.
-
-## Limitaciones de medición
-Los procesos tienen un costo de creación y comunicación; en tamaños pequeños pueden ser más lentos. Los hilos pueden no acelerar cálculos intensivos en CPU en CPython debido al GIL. El rendimiento depende del hardware y del sistema operativo.
-# Actualizacion de pruebas y sincronizacion
+El procedimiento, las variables, la hipótesis, la explicación de latencia/tasa y las limitaciones de caché están en [docs/protocolo.md](docs/protocolo.md). La lectura puede servirse desde RAM por la caché de páginas del sistema operativo; el informe no debe presentarla como una medición garantizada del disco físico.

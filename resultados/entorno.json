@@ -1,0 +1,10 @@
+{
+  "sistema": "Windows",
+  "version_sistema": "10.0.26200",
+  "arquitectura": "AMD64",
+  "procesador": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "cpu_logicas": 16,
+  "directorio_temporal": "C:\\Users\\USUARIO\\AppData\\Local\\Packages\\openai.codex_2p2nqsd0c76g0\\AC\\#!sandbox.{0ddc0d16-053a-4caa-9912-da8c399bb037}\\Temp",
+  "nota_cache": "Las lecturas pueden servirse desde la caché de páginas del sistema operativo."
+}

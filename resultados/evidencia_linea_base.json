@@ -1,0 +1,10 @@
+{
+  "estrategia": "linea_base",
+  "eventos": 5000,
+  "bytes_por_evento": 64,
+  "bytes_leidos": 320000,
+  "sha256": "1f31a75dc675cf02d8867201bf4ed7b5b1290198d7361ab914f2bbe1d31f6f8c",
+  "tiempo_segundos": 1.4269246999174356,
+  "cpu_segundos": 1.375,
+  "tasa_mib_s": 0.2138695764868728
+}

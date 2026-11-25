@@ -3,3 +3,8 @@ __pycache__/
 .venv/
 resultados/*.csv
 resultados/*.json
+!/resultados/evidencia_linea_base.json
+!/resultados/resultados.csv
+!/resultados/resultados.json
+!/resultados/entorno.json
+!/resultados/resumen.json

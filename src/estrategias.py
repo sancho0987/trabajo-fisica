@@ -1,45 +1,59 @@
-"""Tres estrategias equivalentes: secuencial, hilos y procesos."""
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-from src.problema import contar_primos_rango
+"""Estrategias equivalentes de escritura y lectura de eventos de auditoría."""
+from __future__ import annotations
 
-def _contar_bloque(limites):
-    """Función de nivel superior: es serializable para multiprocessing spawn."""
-    inicio, fin = limites
-    return contar_primos_rango(inicio, fin)
+import hashlib
+from pathlib import Path
 
-def _dividir_rango(limite: int, partes: int):
-    if limite < 2:
-        return []
-    partes = max(1, min(partes, limite - 1))
-    total = limite - 1
-    tam = (total + partes - 1) // partes
-    bloques = []
-    inicio = 2
-    while inicio <= limite:
-        fin = min(limite, inicio + tam - 1)
-        bloques.append((inicio, fin))
-        inicio = fin + 1
-    return bloques
 
-def estrategia_secuencial(limite: int) -> int:
-    return contar_primos_rango(2, limite)
+def _resumen(ruta: Path) -> tuple[int, str]:
+    h = hashlib.sha256()
+    total = 0
+    with ruta.open("rb") as archivo:
+        while bloque := archivo.read(64 * 1024):
+            total += len(bloque)
+            h.update(bloque)
+    return total, h.hexdigest()
 
-def estrategia_hilos(limite: int, trabajadores: int | None = None) -> int:
-    bloques = _dividir_rango(limite, trabajadores or (os_cpu_count() or 2))
-    if not bloques:
-        return 0
-    with ThreadPoolExecutor(max_workers=trabajadores) as executor:
-        return sum(executor.map(_contar_bloque, bloques))
 
-def estrategia_procesos(limite: int, trabajadores: int | None = None) -> int:
-    bloques = _dividir_rango(limite, trabajadores or (os_cpu_count() or 2))
-    if not bloques:
-        return 0
-    # La creación del pool se ejecuta al llamar esta función, desde el programa protegido
-    # por if __name__ == "__main__" en el punto de entrada.
-    with ProcessPoolExecutor(max_workers=trabajadores) as executor:
-        return sum(executor.map(_contar_bloque, bloques))
+def _evento(indice: int, bytes_por_evento: int) -> bytes:
+    prefijo = f"evento={indice:09d} accion=lectura\n".encode("ascii")
+    if len(prefijo) > bytes_por_evento:
+        raise ValueError("bytes_por_evento no alcanza para almacenar el registro")
+    return prefijo + b"." * (bytes_por_evento - len(prefijo))
 
-def os_cpu_count():
-    import os
-    return os.cpu_count()
+
+def buffered(ruta: str | Path, eventos: int, bytes_por_evento: int, bloque: int) -> tuple[int, str]:
+    """Mantiene el archivo abierto, acumula bloques de escritura y lee por bloques."""
+    destino = Path(ruta)
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    lote: list[bytes] = []
+    usados = 0
+    with destino.open("wb", buffering=max(2, bloque)) as archivo:
+        for i in range(eventos):
+            linea = _evento(i, bytes_por_evento)
+            lote.append(linea)
+            usados += len(linea)
+            if usados >= bloque:
+                archivo.writelines(lote)
+                lote.clear()
+                usados = 0
+        if lote:
+            archivo.writelines(lote)
+    return _resumen(destino)
+
+
+def texto_lineas(ruta: str | Path, eventos: int, bytes_por_evento: int) -> tuple[int, str]:
+    """Mantiene el archivo abierto en modo texto y procesa cada línea."""
+    destino = Path(ruta)
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    with destino.open("w", encoding="ascii", newline="\n", buffering=64 * 1024) as archivo:
+        for i in range(eventos):
+            archivo.write(_evento(i, bytes_por_evento).decode("ascii"))
+    digest = hashlib.sha256()
+    total = 0
+    with destino.open("r", encoding="ascii", newline="") as archivo:
+        for linea in archivo:
+            datos = linea.encode("ascii")
+            total += len(datos)
+            digest.update(datos)
+    return total, digest.hexdigest()
