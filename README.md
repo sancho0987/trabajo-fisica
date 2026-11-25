@@ -64,3 +64,4 @@ Ejecuta el experimento como módulo desde la raíz del proyecto, usando el coman
 
 ## Limitaciones de medición
 Los procesos tienen un costo de creación y comunicación; en tamaños pequeños pueden ser más lentos. Los hilos pueden no acelerar cálculos intensivos en CPU en CPython debido al GIL. El rendimiento depende del hardware y del sistema operativo.
+# Actualizacion de pruebas y sincronizacion
