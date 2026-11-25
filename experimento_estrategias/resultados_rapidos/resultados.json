@@ -1,0 +1,23 @@
+[
+  {
+    "tamano": 100,
+    "estrategia": "secuencial",
+    "repeticion": 1,
+    "resultado": 25,
+    "tiempo_segundos": 4.51e-05
+  },
+  {
+    "tamano": 100,
+    "estrategia": "hilos",
+    "repeticion": 1,
+    "resultado": 25,
+    "tiempo_segundos": 0.0055799
+  },
+  {
+    "tamano": 100,
+    "estrategia": "procesos",
+    "repeticion": 1,
+    "resultado": 25,
+    "tiempo_segundos": 0.6231648
+  }
+]

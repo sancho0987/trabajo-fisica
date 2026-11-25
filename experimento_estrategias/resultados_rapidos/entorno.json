@@ -1,0 +1,8 @@
+{
+  "sistema": "Windows",
+  "version_sistema": "10.0.26200",
+  "arquitectura": "AMD64",
+  "procesador": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "cpu_logicas": 16
+}
